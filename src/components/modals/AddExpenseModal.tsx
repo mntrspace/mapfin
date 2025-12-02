@@ -19,13 +19,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { expensesApi } from '@/lib/api';
-import { usePeople } from '@/hooks/useSheetData';
+import { usePeople, useTags } from '@/hooks/useSheetData';
+import { TagMultiSelect } from '@/components/shared/TagMultiSelect';
 import {
   EXPENSE_CATEGORY_LABELS,
   PAYMENT_METHOD_LABELS,
   REIMBURSEMENT_STATUS_LABELS,
 } from '@/constants';
-import type { ExpenseCategory, PaymentMethod, ReimbursementStatus } from '@/types';
+import type { ExpenseCategory, PaymentMethod, ReimbursementStatus, Tag } from '@/types';
 import { Loader2 } from 'lucide-react';
 
 interface AddExpenseModalProps {
@@ -36,6 +37,7 @@ interface AddExpenseModalProps {
 
 export function AddExpenseModal({ open, onOpenChange, onSuccess }: AddExpenseModalProps) {
   const { data: people } = usePeople();
+  const { tags: availableTags, createTag } = useTags();
 
   // Form state
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -47,6 +49,7 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess }: AddExpenseMod
   const [personId, setPersonId] = useState('manan');
   const [reimbursementStatus, setReimbursementStatus] = useState<ReimbursementStatus>('none');
   const [remarks, setRemarks] = useState('');
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   // UI state
   const [loading, setLoading] = useState(false);
@@ -62,7 +65,13 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess }: AddExpenseMod
     setPersonId('manan');
     setReimbursementStatus('none');
     setRemarks('');
+    setSelectedTags([]);
     setError(null);
+  };
+
+  const handleCreateTag = async (tag: Omit<Tag, 'id'>): Promise<Tag> => {
+    const result = await createTag(tag);
+    return result.data as Tag;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,6 +102,7 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess }: AddExpenseMod
         person_id: personId,
         reimbursement_status: reimbursementStatus,
         remarks: remarks.trim() || undefined,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
       });
 
       resetForm();
@@ -255,6 +265,18 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess }: AddExpenseMod
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 rows={2}
+              />
+            </div>
+
+            {/* Row 6: Tags */}
+            <div className="space-y-2">
+              <Label>Tags (optional)</Label>
+              <TagMultiSelect
+                availableTags={availableTags}
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                onCreateTag={handleCreateTag}
+                placeholder="Add tags..."
               />
             </div>
 

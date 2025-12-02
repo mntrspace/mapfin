@@ -174,3 +174,24 @@ export function parseCurrencyAmount(value: string | number): number {
 
   return isNaN(parsed) ? 0 : parsed;
 }
+
+/**
+ * Format number in compact notation for chart axes
+ * Uses L/Cr for large INR values, K/M for others
+ */
+export function formatCompactNumber(value: number): string {
+  const absValue = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+
+  // For Indian format (used in charts)
+  if (absValue >= 10_000_000) {
+    return `${sign}${(absValue / 10_000_000).toFixed(1)}Cr`;
+  }
+  if (absValue >= 100_000) {
+    return `${sign}${(absValue / 100_000).toFixed(1)}L`;
+  }
+  if (absValue >= 1_000) {
+    return `${sign}${(absValue / 1_000).toFixed(0)}K`;
+  }
+  return `${sign}${absValue.toFixed(0)}`;
+}

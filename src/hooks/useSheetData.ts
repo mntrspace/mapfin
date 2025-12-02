@@ -9,6 +9,7 @@ import {
   goalsApi,
   categoriesApi,
   cardsApi,
+  tagsApi,
 } from '@/lib/api';
 import type {
   Person,
@@ -19,6 +20,7 @@ import type {
   Budget,
   Goal,
   Card,
+  Tag,
 } from '@/types';
 
 // Generic hook for fetching data
@@ -277,5 +279,166 @@ export function useDashboardData() {
     error: netWorth.error,
     displayMonth,
     isCurrentMonth,
+  };
+}
+
+// YTD Expenses hook with comparison to previous year
+export function useYTDExpenses() {
+  const { data: allExpenses, loading, error } = useExpenses();
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  // YTD: Jan 1 to today of current year
+  const ytdExpenses = allExpenses.filter((e) => {
+    const date = new Date(e.date);
+    return (
+      date.getFullYear() === currentYear &&
+      e.reimbursement_status !== 'reimbursed'
+    );
+  });
+  const ytdTotal = ytdExpenses.reduce((sum, e) => sum + Number(e.inr_amount || 0), 0);
+
+  // Same period last year (Jan 1 to same day of year)
+  const dayOfYear = Math.floor((now.getTime() - new Date(currentYear, 0, 0).getTime()) / 86400000);
+  const prevYearEnd = new Date(currentYear - 1, 0, 0);
+  prevYearEnd.setDate(prevYearEnd.getDate() + dayOfYear);
+
+  const prevYtdExpenses = allExpenses.filter((e) => {
+    const date = new Date(e.date);
+    return (
+      date.getFullYear() === currentYear - 1 &&
+      date <= prevYearEnd &&
+      e.reimbursement_status !== 'reimbursed'
+    );
+  });
+  const prevYtdTotal = prevYtdExpenses.reduce((sum, e) => sum + Number(e.inr_amount || 0), 0);
+
+  // Calculate change
+  const change = ytdTotal - prevYtdTotal;
+  const changePercent = prevYtdTotal > 0
+    ? ((ytdTotal - prevYtdTotal) / prevYtdTotal) * 100
+    : ytdTotal > 0 ? 100 : 0;
+
+  return {
+    total: ytdTotal,
+    previousTotal: prevYtdTotal,
+    change,
+    changePercent,
+    loading,
+    error,
+  };
+}
+
+// Last month expenses with MoM comparison
+export function useLastMonthExpenses() {
+  const { data: allExpenses, loading, error } = useExpenses();
+
+  // Find the most recent complete month with data
+  const now = new Date();
+
+  // Get all unique months with expenses
+  const monthsWithData = new Set(
+    allExpenses.map((e) => {
+      const d = new Date(e.date);
+      return `${d.getFullYear()}-${d.getMonth()}`;
+    })
+  );
+
+  // Find last complete month (not current month)
+  let lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  // If no data in immediate last month, find most recent month with data
+  const lastMonthKey = `${lastMonth.getFullYear()}-${lastMonth.getMonth()}`;
+  if (!monthsWithData.has(lastMonthKey) && monthsWithData.size > 0) {
+    const sortedMonths = Array.from(monthsWithData)
+      .map((key) => {
+        const [year, month] = key.split('-').map(Number);
+        return new Date(year, month, 1);
+      })
+      .sort((a, b) => b.getTime() - a.getTime());
+
+    // Get the most recent month that's not the current month
+    const currentKey = `${now.getFullYear()}-${now.getMonth()}`;
+    lastMonth = sortedMonths.find((d) => `${d.getFullYear()}-${d.getMonth()}` !== currentKey) || lastMonth;
+  }
+
+  const monthBefore = new Date(lastMonth.getFullYear(), lastMonth.getMonth() - 1, 1);
+
+  // Filter expenses for last month
+  const lastMonthExpenses = allExpenses.filter((e) => {
+    const date = new Date(e.date);
+    return (
+      date.getFullYear() === lastMonth.getFullYear() &&
+      date.getMonth() === lastMonth.getMonth() &&
+      e.reimbursement_status !== 'reimbursed'
+    );
+  });
+  const lastMonthTotal = lastMonthExpenses.reduce((sum, e) => sum + Number(e.inr_amount || 0), 0);
+
+  // Filter expenses for month before
+  const monthBeforeExpenses = allExpenses.filter((e) => {
+    const date = new Date(e.date);
+    return (
+      date.getFullYear() === monthBefore.getFullYear() &&
+      date.getMonth() === monthBefore.getMonth() &&
+      e.reimbursement_status !== 'reimbursed'
+    );
+  });
+  const monthBeforeTotal = monthBeforeExpenses.reduce((sum, e) => sum + Number(e.inr_amount || 0), 0);
+
+  // Calculate change
+  const change = lastMonthTotal - monthBeforeTotal;
+  const changePercent = monthBeforeTotal > 0
+    ? ((lastMonthTotal - monthBeforeTotal) / monthBeforeTotal) * 100
+    : lastMonthTotal > 0 ? 100 : 0;
+
+  // Format display month
+  const displayMonth = lastMonth.toLocaleString('default', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return {
+    total: lastMonthTotal,
+    previousTotal: monthBeforeTotal,
+    change,
+    changePercent,
+    displayMonth,
+    loading,
+    error,
+  };
+}
+
+// Tags hook with CRUD operations
+export function useTags() {
+  const { data, loading, error, refetch } = useData<Tag>(tagsApi.getAll);
+
+  const createTag = useCallback(async (tag: Partial<Tag>) => {
+    const result = await tagsApi.create(tag);
+    await refetch();
+    return result;
+  }, [refetch]);
+
+  const updateTag = useCallback(async (id: string, tag: Partial<Tag>) => {
+    const result = await tagsApi.update(id, tag);
+    await refetch();
+    return result;
+  }, [refetch]);
+
+  const deleteTag = useCallback(async (id: string) => {
+    const result = await tagsApi.delete(id);
+    await refetch();
+    return result;
+  }, [refetch]);
+
+  return {
+    tags: data,
+    loading,
+    error,
+    refetch,
+    createTag,
+    updateTag,
+    deleteTag,
   };
 }

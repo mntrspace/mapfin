@@ -84,17 +84,21 @@ export const GOAL_TYPE_LABELS: Record<GoalType, string> = {
   purchase: 'Purchase Goal',
 };
 
-// Time range options for charts
+// Time range options for charts with auto-granularity
+// 1M, 3M, 6M -> monthly | 1Y, 2Y -> quarterly | 3Y, 5Y, ALL -> yearly
 export const TIME_RANGES = [
-  { value: '3M', label: '3M' },
-  { value: '6M', label: '6M' },
-  { value: '1Y', label: '1Y' },
-  { value: '2Y', label: '2Y' },
-  { value: '5Y', label: '5Y' },
-  { value: 'ALL', label: 'All' },
+  { value: '1M', label: '1M', granularity: 'monthly' },
+  { value: '3M', label: '3M', granularity: 'monthly' },
+  { value: '6M', label: '6M', granularity: 'monthly' },
+  { value: '1Y', label: '1Y', granularity: 'quarterly' },
+  { value: '2Y', label: '2Y', granularity: 'quarterly' },
+  { value: '3Y', label: '3Y', granularity: 'yearly' },
+  { value: '5Y', label: '5Y', granularity: 'yearly' },
+  { value: 'ALL', label: 'All', granularity: 'yearly' },
 ] as const;
 
-export type TimeRange = (typeof TIME_RANGES)[number]['value'];
+export type TimeRangeValue = (typeof TIME_RANGES)[number]['value'];
+export type TimeRangeGranularity = (typeof TIME_RANGES)[number]['granularity'];
 
 // Person filter options
 export const PERSON_FILTERS = [
@@ -128,3 +132,19 @@ export const CHART_COLORS = [
   '#FFBB28',
   '#FF8042',
 ];
+
+// Preset colors for expense tags (10 distinct colors)
+export const TAG_COLORS = [
+  { value: '#3b82f6', label: 'Blue' },
+  { value: '#22c55e', label: 'Green' },
+  { value: '#f59e0b', label: 'Amber' },
+  { value: '#ef4444', label: 'Red' },
+  { value: '#8b5cf6', label: 'Purple' },
+  { value: '#ec4899', label: 'Pink' },
+  { value: '#06b6d4', label: 'Cyan' },
+  { value: '#f97316', label: 'Orange' },
+  { value: '#14b8a6', label: 'Teal' },
+  { value: '#64748b', label: 'Slate' },
+] as const;
+
+export type TagColor = (typeof TAG_COLORS)[number]['value'];

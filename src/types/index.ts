@@ -85,6 +85,13 @@ export type PaymentMethod =
 // Reimbursement Status
 export type ReimbursementStatus = 'none' | 'pending' | 'reimbursed';
 
+// Tag for categorizing expenses
+export interface Tag {
+  id: string;
+  name: string;
+  color: string; // Hex color like "#3b82f6"
+}
+
 // Expense
 export interface Expense {
   id: string;
@@ -99,6 +106,7 @@ export interface Expense {
   remarks?: string;
   person_id: string;
   reimbursement_status: ReimbursementStatus;
+  tags?: Tag[]; // Optional tags for expense categorization
 }
 
 // Income Sources

@@ -179,10 +179,19 @@ export function useSettings(): SettingsContextType {
 }
 
 /**
+ * Format options type for use in formatters
+ */
+export interface FormatOptions {
+  currency: Currency;
+  numberFormat: NumberFormat;
+  exchangeRate: number;
+}
+
+/**
  * Hook that provides format options from current settings
  * Use this to pass to formatCurrency and other formatter functions
  */
-export function useFormatOptions() {
+export function useFormatOptions(): FormatOptions {
   const { settings } = useSettings();
   return {
     currency: settings.currency,

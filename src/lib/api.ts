@@ -36,6 +36,7 @@ export const SHEETS = {
   GOALS: 'Goals',
   CATEGORIES: 'Categories',
   CARDS: 'Cards',
+  TAGS: 'Tags',
 } as const;
 
 // Generic CRUD operations
@@ -95,10 +96,39 @@ export const liabilitiesApi = {
   delete: (id: string) => api.delete(SHEETS.LIABILITIES, id),
 };
 
+// Helper to parse tags JSON string
+function parseTags(tagsStr: unknown): import('@/types').Tag[] | undefined {
+  if (!tagsStr || tagsStr === '') return undefined;
+  try {
+    return JSON.parse(tagsStr as string);
+  } catch {
+    return undefined;
+  }
+}
+
 export const expensesApi = {
-  getAll: () => api.getAll<import('@/types').Expense>(SHEETS.EXPENSES),
-  create: (data: Partial<import('@/types').Expense>) => api.create(SHEETS.EXPENSES, data),
-  update: (id: string, data: Partial<import('@/types').Expense>) => api.update(SHEETS.EXPENSES, id, data),
+  getAll: async () => {
+    const data = await api.getAll<import('@/types').Expense & { tags?: string }>(SHEETS.EXPENSES);
+    // Parse tags JSON string back to array
+    return data.map(expense => ({
+      ...expense,
+      tags: parseTags(expense.tags),
+    })) as import('@/types').Expense[];
+  },
+  create: (data: Partial<import('@/types').Expense>) => {
+    const payload = {
+      ...data,
+      tags: data.tags && data.tags.length > 0 ? JSON.stringify(data.tags) : undefined,
+    };
+    return api.create(SHEETS.EXPENSES, payload);
+  },
+  update: (id: string, data: Partial<import('@/types').Expense>) => {
+    const payload = {
+      ...data,
+      tags: data.tags && data.tags.length > 0 ? JSON.stringify(data.tags) : undefined,
+    };
+    return api.update(SHEETS.EXPENSES, id, payload);
+  },
   delete: (id: string) => api.delete(SHEETS.EXPENSES, id),
 };
 
@@ -135,4 +165,11 @@ export const cardsApi = {
   create: (data: Partial<import('@/types').Card>) => api.create(SHEETS.CARDS, data),
   update: (id: string, data: Partial<import('@/types').Card>) => api.update(SHEETS.CARDS, id, data),
   delete: (id: string) => api.delete(SHEETS.CARDS, id),
+};
+
+export const tagsApi = {
+  getAll: () => api.getAll<import('@/types').Tag>(SHEETS.TAGS),
+  create: (data: Partial<import('@/types').Tag>) => api.create(SHEETS.TAGS, data),
+  update: (id: string, data: Partial<import('@/types').Tag>) => api.update(SHEETS.TAGS, id, data),
+  delete: (id: string) => api.delete(SHEETS.TAGS, id),
 };

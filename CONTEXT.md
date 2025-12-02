@@ -2,8 +2,8 @@
 
 **Project Name:** MapFin (Map + Finance = Mapping your finances)
 **Location:** `/Users/mntr-space/Documents/Projects/CtrlFin/MapFin`
-**Last Updated:** December 2024
-**Implementation Status:** Phase 2 Complete - Google Sheets Integration Ready
+**Last Updated:** December 2025
+**Implementation Status:** Phase 5 Complete - Dashboard Redesign with Charts & Tags
 
 ---
 
@@ -162,12 +162,13 @@ User has 20+ cards tracked for payment specifics dropdown.
 | People | User profiles (id, name, relationship) |
 | NetWorthEntries | Snapshot asset values per date |
 | Liabilities | Loans and debts |
-| Expenses | All expense transactions |
+| Expenses | All expense transactions (with tags JSON column) |
 | Income | Income entries |
 | Budgets | Monthly category budgets |
 | Goals | Financial targets |
 | Categories | Expense categories (editable) |
 | Cards | Payment cards for dropdowns |
+| Tags | Tag definitions (id, name, color) |
 
 ---
 
@@ -229,7 +230,7 @@ These are reference files. The app will use a new Google Sheet with the defined 
 ### Phase 1 Complete (Project Setup)
 - React + Vite + TypeScript initialized
 - Tailwind CSS v3 configured with shadcn theme
-- shadcn/ui components installed (button, card, dialog, input, select, label, textarea, badge, separator, scroll-area, tabs, tooltip, dropdown-menu)
+- shadcn/ui components installed
 - Project folder structure created
 - React Router configured with nested routes
 - All 4 pages created (Home, Wealth, Expenses, Goals)
@@ -240,22 +241,53 @@ These are reference files. The app will use a new Google Sheet with the defined 
 - Google Cloud project created with Sheets API enabled
 - Service account authentication configured
 - Express API server (`server/index.mjs`) running on port 3001
-- Full CRUD operations for all 9 sheets:
-  - People, NetWorthEntries, Liabilities, Expenses
-  - Income, Budgets, Goals, Categories, Cards
-- React hooks created (`src/hooks/useSheetData.ts`):
-  - `usePeople`, `useNetWorth`, `useNetWorthSummary`
-  - `useLiabilities`, `useExpenses`, `useCurrentMonthExpenses`
-  - `useIncome`, `useBudgets`, `useGoals`, `useCategories`, `useCards`
-  - `useDashboardData` (aggregated data for Home)
+- Full CRUD operations for all 10 sheets
+- React hooks created (`src/hooks/useSheetData.ts`)
 - API client with typed helpers (`src/lib/api.ts`)
 - All pages connected to live Google Sheets data
 
-### Next: Phase 3 (Core UI Components)
-- Create AddExpenseModal component
-- Refine layout and navigation
-- Add currency formatter improvements
-- Set up responsive breakpoints
+### Phase 3 Complete (Core UI & Data Import)
+- AddExpenseModal component with full form
+- Excel data import script (`scripts/import-excel.mjs`)
+- Vercel deployment configured
+- Currency formatter with INR/USD toggle
+
+### Phase 4 Complete (Settings Page)
+- Settings page with currency/format toggles
+- SettingsContext for app-wide preferences
+- Exchange rate API integration (auto-refreshing)
+- Number format options (Indian lakhs/crores vs Western K/M/B)
+
+### Phase 5 Complete (Dashboard Redesign with Charts & Tags)
+- **Recharts visualizations**:
+  - TimeSeriesBarChart for trends
+  - AllocationPieChart for breakdowns
+  - ChartContainer and ChartTooltip components
+- **Global filters**:
+  - PersonTabs (Aggregate/Manan/Anushka)
+  - TimeRangeSelector (1M to ALL with auto-granularity)
+- **Tags system**:
+  - Tags sheet in Google Sheets (id, name, color)
+  - Tags column in Expenses sheet (JSON serialized)
+  - TagMultiSelect component for selection/creation
+  - TagBadge component for display
+  - useTags hook with CRUD operations
+- **Comparison cards**:
+  - YTD expenses with YoY comparison
+  - Last month expenses with MoM comparison
+- **New data utilities**:
+  - `src/lib/dateUtils.ts` - Time range calculations
+  - `src/lib/chartUtils.ts` - Data aggregation for charts
+- **Page rewrites**:
+  - Home: Net worth card, expense cards with comparisons
+  - Wealth: Bar/pie charts, person filtering, time range
+  - Expenses: Charts, tags filter, transaction list with badges
+
+### Next: Phase 6 (Future)
+- Live portfolio API integrations
+- Statement imports
+- Dark mode
+- AI-powered analysis
 
 ---
 

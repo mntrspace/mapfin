@@ -1,7 +1,7 @@
 # MapFin - Product Specification v1.0
 
-**Status:** FINALIZED - Ready for Implementation
-**Last Updated:** December 2024
+**Status:** Phase 5 Implemented
+**Last Updated:** December 2025
 
 ---
 
@@ -140,8 +140,14 @@ interest_rate, emi, currency, last_updated, notes
 ```
 id, date, description, category, currency_amount, inr_amount,
 payment_method, payment_specifics, transaction_details,
-remarks, person_id, reimbursement_status
+remarks, person_id, reimbursement_status, tags (JSON)
 ```
+
+### Tag
+```
+id, name, color (hex)
+```
+Tags are stored as JSON array in Expense.tags: `[{"id":"...", "name":"...", "color":"#3b82f6"}]`
 
 **Reimbursement Status Values:**
 | Value | Meaning | Include in Totals? |
@@ -182,12 +188,13 @@ Used to populate payment_specifics dropdown.
 | **People** | User profiles | id, name, relationship |
 | **NetWorthEntries** | Snapshot asset values | report_date, person_id, category, amount_inr, description |
 | **Liabilities** | Loans and debts | person_id, category, name, outstanding, emi |
-| **Expenses** | All transactions | date, description, category, inr_amount, payment_method, payment_specifics, reimbursement_status, person_id |
+| **Expenses** | All transactions | date, description, category, inr_amount, payment_method, payment_specifics, reimbursement_status, person_id, tags |
 | **Income** | Income entries | date, amount, source, person_id |
 | **Budgets** | Monthly limits | category, monthly_limit |
 | **Goals** | Financial targets | name, type, target_amount, target_date |
 | **Categories** | Expense categories | name (editable list) |
 | **Cards** | Payment cards | person_id, bank_name, card_name, card_type, status |
+| **Tags** | Tag definitions | id, name, color |
 
 ---
 
