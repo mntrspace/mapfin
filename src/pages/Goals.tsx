@@ -2,12 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency, formatDate } from '@/lib/formatters';
+import { useFormatOptions } from '@/contexts/SettingsContext';
 import { GOAL_TYPE_LABELS } from '@/constants';
 import type { GoalType } from '@/types';
 import { Plus, Target, TrendingUp, Loader2 } from 'lucide-react';
 import { useGoals } from '@/hooks/useSheetData';
 
 export default function Goals() {
+  const formatOptions = useFormatOptions();
   const { data: goals, loading, error } = useGoals();
 
   // Calculate progress for each goal
@@ -100,7 +102,7 @@ export default function Goals() {
             ) : (
               <>
                 <div className="text-2xl font-bold">
-                  {formatCurrency(totalTarget)}
+                  {formatCurrency(totalTarget, formatOptions)}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Combined goal amount
@@ -160,8 +162,8 @@ export default function Goals() {
                     <div className="flex justify-between text-sm mb-2">
                       <span className="text-muted-foreground">Progress</span>
                       <span className="font-medium">
-                        {formatCurrency(goal.current)} /{' '}
-                        {formatCurrency(goal.target)}
+                        {formatCurrency(goal.current, formatOptions)} /{' '}
+                        {formatCurrency(goal.target, formatOptions)}
                       </span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-secondary">
@@ -177,7 +179,7 @@ export default function Goals() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Remaining</span>
                     <span className="font-medium">
-                      {formatCurrency(goal.remaining)}
+                      {formatCurrency(goal.remaining, formatOptions)}
                     </span>
                   </div>
 

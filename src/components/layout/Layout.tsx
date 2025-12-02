@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 import { Header } from './Header';
+import { AddExpenseModal } from '@/components/modals/AddExpenseModal';
 
 export function Layout() {
+  const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+
   const handleAddExpense = () => {
-    // TODO: Open AddExpenseModal
-    console.log('Add expense clicked');
+    setExpenseModalOpen(true);
   };
 
   return (
@@ -26,6 +29,12 @@ export function Layout() {
 
       {/* Mobile Navigation */}
       <MobileNav />
+
+      {/* Add Expense Modal */}
+      <AddExpenseModal
+        open={expenseModalOpen}
+        onOpenChange={setExpenseModalOpen}
+      />
     </div>
   );
 }

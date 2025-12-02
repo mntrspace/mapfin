@@ -1,10 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency, formatPercent } from '@/lib/formatters';
+import { useFormatOptions } from '@/contexts/SettingsContext';
 import { TrendingUp, TrendingDown, Wallet, Receipt, Target, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useSheetData';
 
 export default function Home() {
+  const formatOptions = useFormatOptions();
   const {
     netWorth,
     netWorthLoading,
@@ -54,7 +56,7 @@ export default function Home() {
             ) : (
               <>
                 <div className="text-2xl font-bold">
-                  {formatCurrency(netWorth)}
+                  {formatCurrency(netWorth, formatOptions)}
                 </div>
                 {netWorthChange !== 0 && (
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -97,13 +99,13 @@ export default function Home() {
             ) : (
               <>
                 <div className="text-2xl font-bold">
-                  {formatCurrency(monthlySpending)}
+                  {formatCurrency(monthlySpending, formatOptions)}
                 </div>
                 {totalBudget > 0 ? (
                   <>
                     <p className="text-xs text-muted-foreground">
-                      {formatCurrency(Math.max(0, totalBudget - monthlySpending))}{' '}
-                      remaining of {formatCurrency(totalBudget)} budget
+                      {formatCurrency(Math.max(0, totalBudget - monthlySpending), formatOptions)}{' '}
+                      remaining of {formatCurrency(totalBudget, formatOptions)} budget
                     </p>
                     <div className="mt-2 h-2 w-full rounded-full bg-secondary">
                       <div

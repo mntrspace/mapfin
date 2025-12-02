@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency, formatPercent } from '@/lib/formatters';
+import { useFormatOptions } from '@/contexts/SettingsContext';
 import { ASSET_CATEGORY_LABELS, PERSON_FILTERS, TIME_RANGES } from '@/constants';
 import type { AssetCategory } from '@/types';
 import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
@@ -8,6 +9,7 @@ import { useState } from 'react';
 import { useNetWorthSummary, useLiabilities } from '@/hooks/useSheetData';
 
 export default function Wealth() {
+  const formatOptions = useFormatOptions();
   const [personFilter, setPersonFilter] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<string>('1Y');
 
@@ -98,7 +100,7 @@ export default function Wealth() {
           ) : (
             <div className="flex items-baseline gap-4">
               <span className="text-4xl font-bold">
-                {formatCurrency(total - totalLiabilities)}
+                {formatCurrency(total - totalLiabilities, formatOptions)}
               </span>
               {change !== 0 && (
                 <div className="flex items-center gap-1">
@@ -112,7 +114,7 @@ export default function Wealth() {
                       change >= 0 ? 'text-green-500' : 'text-red-500'
                     }`}
                   >
-                    {formatCurrency(change)} ({formatPercent(changePercent)})
+                    {formatCurrency(change, formatOptions)} ({formatPercent(changePercent)})
                   </span>
                 </div>
               )}
@@ -148,7 +150,7 @@ export default function Wealth() {
                       <div className="flex justify-between text-sm">
                         <span>{ASSET_CATEGORY_LABELS[category as AssetCategory] || category}</span>
                         <span className="font-medium">
-                          {formatCurrency(value)} ({percentage.toFixed(1)}%)
+                          {formatCurrency(value, formatOptions)} ({percentage.toFixed(1)}%)
                         </span>
                       </div>
                       <div className="h-2 w-full rounded-full bg-secondary">
@@ -187,12 +189,12 @@ export default function Wealth() {
                     <span className="text-sm">
                       {ASSET_CATEGORY_LABELS[category as AssetCategory] || category}
                     </span>
-                    <span className="font-medium">{formatCurrency(value)}</span>
+                    <span className="font-medium">{formatCurrency(value, formatOptions)}</span>
                   </div>
                 ))}
                 <div className="flex justify-between items-center py-2 border-t-2 font-bold">
                   <span>Total Assets</span>
-                  <span>{formatCurrency(total)}</span>
+                  <span>{formatCurrency(total, formatOptions)}</span>
                 </div>
               </div>
             )}
@@ -223,17 +225,17 @@ export default function Wealth() {
                     <p className="font-medium">{liability.name}</p>
                     <p className="text-sm text-muted-foreground">
                       {liability.category} • {liability.interest_rate}% interest
-                      {liability.emi && ` • EMI: ${formatCurrency(Number(liability.emi))}`}
+                      {liability.emi && ` • EMI: ${formatCurrency(Number(liability.emi), formatOptions)}`}
                     </p>
                   </div>
                   <span className="font-medium text-destructive">
-                    -{formatCurrency(Number(liability.outstanding))}
+                    -{formatCurrency(Number(liability.outstanding), formatOptions)}
                   </span>
                 </div>
               ))}
               <div className="flex justify-between items-center py-2 border-t-2 font-bold">
                 <span>Total Liabilities</span>
-                <span className="text-destructive">-{formatCurrency(totalLiabilities)}</span>
+                <span className="text-destructive">-{formatCurrency(totalLiabilities, formatOptions)}</span>
               </div>
             </div>
           )}

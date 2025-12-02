@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/constants';
-import { LayoutDashboard, Wallet, Receipt, Target } from 'lucide-react';
+import { LayoutDashboard, Wallet, Receipt, Target, Settings } from 'lucide-react';
 
 const iconMap = {
   LayoutDashboard,
@@ -36,6 +36,19 @@ export function MobileNav() {
             </Link>
           );
         })}
+        {/* Settings link */}
+        <Link
+          to="/settings"
+          className={cn(
+            'flex flex-col items-center justify-center flex-1 h-full transition-colors',
+            location.pathname === '/settings'
+              ? 'text-primary'
+              : 'text-muted-foreground'
+          )}
+        >
+          <Settings className="h-5 w-5" />
+          <span className="text-xs mt-1">Settings</span>
+        </Link>
       </div>
     </nav>
   );

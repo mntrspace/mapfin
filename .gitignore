@@ -41,3 +41,4 @@ dist-ssr
 !tsconfig.app.json
 !tsconfig.node.json
 !components.json
+.vercel

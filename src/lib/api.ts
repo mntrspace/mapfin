@@ -1,6 +1,9 @@
 // API client for MapFin backend
 
-const API_BASE = 'http://localhost:3001/api';
+// Use relative URL for Vercel deployment, fallback to local for dev
+const API_BASE = import.meta.env.DEV
+  ? 'http://localhost:3001/api'
+  : '/api';
 
 // Generic fetch wrapper
 async function fetchApi<T>(

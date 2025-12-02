@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/constants';
-import { LayoutDashboard, Wallet, Receipt, Target } from 'lucide-react';
+import { LayoutDashboard, Wallet, Receipt, Target, Settings } from 'lucide-react';
 
 const iconMap = {
   LayoutDashboard,
@@ -49,8 +49,24 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer */}
+      {/* Settings Link */}
       <div className="p-4 border-t">
+        <Link
+          to="/settings"
+          className={cn(
+            'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+            location.pathname === '/settings'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+          )}
+        >
+          <Settings className="h-5 w-5" />
+          Settings
+        </Link>
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 pt-0">
         <p className="text-xs text-muted-foreground text-center">
           MapFin v1.0
         </p>

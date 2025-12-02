@@ -3,14 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency, formatDate } from '@/lib/formatters';
+import { useFormatOptions } from '@/contexts/SettingsContext';
 import { EXPENSE_CATEGORY_LABELS, PAYMENT_METHOD_LABELS } from '@/constants';
 import type { ExpenseCategory, PaymentMethod } from '@/types';
-import { Plus, Search, Filter, Loader2 } from 'lucide-react';
+import { Search, Filter, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useCurrentMonthExpenses, useBudgets } from '@/hooks/useSheetData';
 
 export default function Expenses() {
   const [searchQuery, setSearchQuery] = useState('');
+  const formatOptions = useFormatOptions();
 
   const { expenses, total, byCategory, loading, error } = useCurrentMonthExpenses();
   const { data: budgets } = useBudgets();
@@ -53,10 +55,6 @@ export default function Expenses() {
             Track and manage your spending
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Expense
-        </Button>
       </div>
 
       {/* Monthly Summary */}
@@ -71,13 +69,13 @@ export default function Expenses() {
             ) : (
               <>
                 <div className="text-2xl font-bold">
-                  {formatCurrency(total)}
+                  {formatCurrency(total, formatOptions)}
                 </div>
                 {totalBudget > 0 ? (
                   <>
                     <p className="text-xs text-muted-foreground">
-                      {formatCurrency(Math.max(0, totalBudget - total))}{' '}
-                      remaining of {formatCurrency(totalBudget)} budget
+                      {formatCurrency(Math.max(0, totalBudget - total), formatOptions)}{' '}
+                      remaining of {formatCurrency(totalBudget, formatOptions)} budget
                     </p>
                     <div className="mt-2 h-2 w-full rounded-full bg-secondary">
                       <div
@@ -146,7 +144,7 @@ export default function Expenses() {
                     <div className="flex justify-between text-sm">
                       <span>{EXPENSE_CATEGORY_LABELS[category as ExpenseCategory] || category}</span>
                       <span className="font-medium">
-                        {formatCurrency(value)} ({percentage.toFixed(0)}%)
+                        {formatCurrency(value, formatOptions)} ({percentage.toFixed(0)}%)
                       </span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-secondary">
@@ -217,7 +215,7 @@ export default function Expenses() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {formatCurrency(Number(expense.inr_amount))}
+                      {formatCurrency(Number(expense.inr_amount), formatOptions)}
                     </p>
                     {expense.reimbursement_status !== 'none' && (
                       <Badge
