@@ -14,7 +14,7 @@ export default function Expenses() {
   const [searchQuery, setSearchQuery] = useState('');
   const formatOptions = useFormatOptions();
 
-  const { expenses, total, byCategory, loading, error } = useCurrentMonthExpenses();
+  const { expenses, total, byCategory, loading, error, displayMonth, isCurrentMonth } = useCurrentMonthExpenses();
   const { data: budgets } = useBudgets();
 
   // Calculate total budget
@@ -61,7 +61,12 @@ export default function Expenses() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {displayMonth || 'This Month'}
+              {!isCurrentMonth && !loading && (
+                <span className="text-xs font-normal text-muted-foreground ml-2">(latest)</span>
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (

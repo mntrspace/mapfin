@@ -15,6 +15,8 @@ export default function Home() {
     goalsProgress,
     loading,
     error,
+    displayMonth,
+    isCurrentMonth,
   } = useDashboardData();
 
   // TODO: Calculate actual change from previous period
@@ -90,7 +92,12 @@ export default function Home() {
         {/* Monthly Spending Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Spending</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {displayMonth || 'Monthly Spending'}
+              {!isCurrentMonth && !loading && (
+                <span className="text-xs font-normal text-muted-foreground ml-1">(latest)</span>
+              )}
+            </CardTitle>
             <Receipt className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>

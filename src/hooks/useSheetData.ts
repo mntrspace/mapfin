@@ -148,8 +148,73 @@ export function useExpensesByMonth(year: number, month: number) {
 }
 
 export function useCurrentMonthExpenses() {
+  const { data: allExpenses, loading, error, refetch } = useExpenses();
+
+  // Find the most recent month with expenses
+  // If no expenses in current month, fall back to most recent month
   const now = new Date();
-  return useExpensesByMonth(now.getFullYear(), now.getMonth());
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  // Check if there are expenses in current month
+  const currentMonthExpenses = allExpenses.filter((expense) => {
+    const date = new Date(expense.date);
+    return date.getFullYear() === currentYear && date.getMonth() === currentMonth;
+  });
+
+  // If no expenses in current month, find most recent month
+  let targetYear = currentYear;
+  let targetMonth = currentMonth;
+
+  if (currentMonthExpenses.length === 0 && allExpenses.length > 0) {
+    // Find the most recent expense date
+    const mostRecentExpense = allExpenses.reduce((latest, expense) => {
+      const expenseDate = new Date(expense.date);
+      const latestDate = new Date(latest.date);
+      return expenseDate > latestDate ? expense : latest;
+    }, allExpenses[0]);
+
+    const recentDate = new Date(mostRecentExpense.date);
+    targetYear = recentDate.getFullYear();
+    targetMonth = recentDate.getMonth();
+  }
+
+  // Filter expenses for the target month
+  const filtered = allExpenses.filter((expense) => {
+    const date = new Date(expense.date);
+    return date.getFullYear() === targetYear && date.getMonth() === targetMonth;
+  });
+
+  // Exclude reimbursed expenses from totals
+  const forTotals = filtered.filter((e) => e.reimbursement_status !== 'reimbursed');
+
+  const total = forTotals.reduce((sum, e) => sum + Number(e.inr_amount || 0), 0);
+
+  const byCategory = forTotals.reduce(
+    (acc, e) => {
+      const cat = e.category;
+      acc[cat] = (acc[cat] || 0) + Number(e.inr_amount || 0);
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  // Format display month
+  const monthName = new Date(targetYear, targetMonth).toLocaleString('default', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return {
+    expenses: filtered,
+    total,
+    byCategory,
+    loading,
+    error,
+    refetch,
+    displayMonth: monthName,
+    isCurrentMonth: targetYear === currentYear && targetMonth === currentMonth,
+  };
 }
 
 // Income hook
@@ -180,7 +245,7 @@ export function useCards() {
 // Combined data hook for dashboard
 export function useDashboardData() {
   const netWorth = useNetWorthSummary();
-  const { total: monthlySpending, byCategory } = useCurrentMonthExpenses();
+  const { total: monthlySpending, byCategory, displayMonth, isCurrentMonth } = useCurrentMonthExpenses();
   const { data: budgets } = useBudgets();
   const { data: goals } = useGoals();
 
@@ -210,5 +275,7 @@ export function useDashboardData() {
     goals: goalsWithProgress,
     loading: netWorth.loading,
     error: netWorth.error,
+    displayMonth,
+    isCurrentMonth,
   };
 }
