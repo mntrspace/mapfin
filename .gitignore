@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +27,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Data files (reference only, not tracked)
+*.xlsx
+*.xls
+*.csv
+
+# Google credentials (never commit)
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!tsconfig.app.json
+!tsconfig.node.json
+!components.json
