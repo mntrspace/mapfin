@@ -1,7 +1,7 @@
 # MapFin - Implementation Plan v1.0
 
-**Status:** IN PROGRESS - Phase 2 Complete, Ready for Phase 3
-**Last Updated:** December 2, 2024
+**Status:** IN PROGRESS - Phase 5 Complete, Ready for Phase 6
+**Last Updated:** December 3, 2025
 
 > **Resume Instructions:** If returning to this project after a break, read this file and CONTEXT.md first. Check the "Current Status" section below to see where implementation left off. Each phase has checkboxes - find the first unchecked item and continue from there.
 
@@ -388,7 +388,7 @@ VITE_GOOGLE_SHEET_ID=your_sheet_id_here
 
 If implementation is interrupted, check which phase/task was last completed and continue from there. Each task is designed to be independently completable.
 
-**Current Status:** Phase 2 Complete - Ready for Phase 3 (Core UI Components)
+**Current Status:** Phase 5 Complete - Ready for Phase 6 (Future)
 
 ---
 
@@ -424,3 +424,87 @@ If implementation is interrupted, check which phase/task was last completed and 
 ---
 
 *This plan document should be read alongside CONTEXT.md when resuming work on this project.*
+
+---
+
+## Security Vulnerabilities (Dependabot)
+
+**Status:** 16 vulnerabilities detected - December 3, 2025
+**Dependabot URL:** https://github.com/mntrspace/mapfin/security/dependabot
+
+### HIGH Priority (3)
+
+- [ ] **path-to-regexp** - ReDoS via backtracking regular expressions
+  - Impact: Server-side request handling could be slowed
+  - Fix: Update to latest version
+
+- [ ] **xlsx** - Regular Expression Denial of Service (ReDoS)
+  - Impact: Excel import script could hang on malformed files
+  - Fix: Update xlsx package or replace with alternative (e.g., exceljs)
+
+- [ ] **xlsx** - Prototype Pollution in SheetJS
+  - Impact: Potential code execution via crafted spreadsheet
+  - Fix: Same as above - update or replace xlsx
+
+### MEDIUM Priority (9)
+
+- [ ] **esbuild** - Dev server request bypass (any website can read responses)
+  - Impact: Dev-only, but could leak source code
+  - Fix: Update esbuild (via vite update)
+
+- [ ] **undici** - Use of insufficiently random values
+  - Impact: Potential security weaknesses in HTTP client
+  - Fix: Update undici
+
+- [ ] **js-yaml** - Prototype pollution in merge (`<<`)
+  - Impact: Potential code execution via crafted YAML
+  - Fix: Update js-yaml
+
+- [ ] **vite** - Multiple server.fs.deny bypasses (6 issues)
+  - server.fs.deny bypass via backslash on Windows
+  - server.fs.deny bypassed with `/` for files under project root
+  - server.fs.deny bypass with invalid request-target
+  - server.fs.deny bypass with .svg or relative paths
+  - server.fs.deny bypassed for inline/raw with ?import
+  - server.fs.deny bypass using ?raw??
+  - Impact: Dev server could serve restricted files
+  - Fix: Update vite to latest version
+
+### LOW Priority (4)
+
+- [ ] **undici** - Denial of Service via bad certificate data
+  - Impact: HTTP client could crash on malformed certs
+  - Fix: Update undici
+
+- [ ] **vite** - HTML files not respecting server.fs settings
+  - Impact: Dev-only, minor file access issue
+  - Fix: Included in vite update
+
+- [ ] **vite** - Public directory name collision
+  - Impact: Dev-only, minor file serving issue
+  - Fix: Included in vite update
+
+- [ ] **@eslint/plugin-kit** - ReDoS through ConfigCommentParser
+  - Impact: Linting could hang on crafted comments
+  - Fix: Update eslint dependencies
+
+### Recommended Actions
+
+1. **Update vite** to latest version (fixes 8 issues):
+   ```bash
+   npm update vite
+   ```
+
+2. **Update undici** (fixes 2 issues):
+   ```bash
+   npm update undici
+   ```
+
+3. **Replace or update xlsx** (fixes 2 HIGH issues):
+   - Option A: `npm update xlsx`
+   - Option B: Replace with `exceljs` for Excel parsing
+
+4. **Run npm audit fix** for remaining issues:
+   ```bash
+   npm audit fix
+   ```
