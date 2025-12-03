@@ -3,7 +3,7 @@
 **Project Name:** MapFin (Map + Finance = Mapping your finances)
 **Location:** `/Users/mntr-space/Documents/Projects/CtrlFin/MapFin`
 **Last Updated:** December 2025
-**Implementation Status:** Phase 5 Complete - Dashboard Redesign with Charts & Tags
+**Implementation Status:** Phase 6 Complete - Expense Filters & Pagination
 
 ---
 
@@ -283,7 +283,34 @@ These are reference files. The app will use a new Google Sheet with the defined 
   - Wealth: Bar/pie charts, person filtering, time range
   - Expenses: Charts, tags filter, transaction list with badges
 
-### Next: Phase 6 (Future)
+### Phase 6 Complete (Expense Filters & Pagination)
+- **ExpenseFilters component**:
+  - Collapsible filter panel
+  - Multi-select dropdowns for categories, payment methods, payment specifics, tags
+  - Amount range filter (min/max inputs)
+  - Reimbursement status multi-select
+  - Active filter count badge
+  - Clear all filters button
+- **Pagination component**:
+  - Page navigation with ellipsis
+  - Page size selector (25, 50, 100)
+  - Shows "X-Y of Z" count
+- **Category colors**:
+  - EXPENSE_CATEGORY_COLORS constant
+  - Colored left border on transaction rows
+  - Colored category badges
+- **New components**:
+  - `src/components/shared/ExpenseFilters.tsx`
+  - `src/components/shared/Pagination.tsx`
+- **Type additions**:
+  - ExpenseFilterState interface
+
+### Next: Phase 7 (Goals Dashboard)
+- Goal cards with progress bars
+- Add/edit goal modals
+- Goal projection calculations
+
+### Future Phases
 - Live portfolio API integrations
 - Statement imports
 - Dark mode

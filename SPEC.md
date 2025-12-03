@@ -228,20 +228,25 @@ Used to populate payment_specifics dropdown.
 - Monthly summary by category
 - Budget vs actual comparison
 - Category progress bars (green/yellow/red)
-- Transaction list with filters
+- Transaction list with category colors (colored left border + badge)
 - "Add Expense" modal (quick-add)
 - Month-over-month trends
+- YTD vs last year comparison
+- Pagination for large transaction lists
 - Reimbursement status filter
 
-### Transaction Filters
-- Category
-- Amount (range)
-- Payment Method
-- Payment Specifics (from Cards)
-- Person
+### Transaction Filters (Collapsible Panel)
+- **Category** - Multi-select dropdown
+- **Amount Range** - Min/max INR inputs
+- **Payment Method** - Multi-select dropdown
+- **Payment Specifics** - Multi-select (from Cards)
+- **Tags** - Multi-select filter
+- **Reimbursement Status** - Multi-select (none/pending/reimbursed)
+- Person tabs (Self/Spouse/Aggregate)
+- Time range selector (1M to ALL)
 - Fuzzy search on description
-- Date range
-- Reimbursement status
+- Active filter count badge
+- Clear all filters button
 
 ### Goals
 - Goal cards with progress bars

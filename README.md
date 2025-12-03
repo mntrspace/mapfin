@@ -6,8 +6,14 @@ Personal finance dashboard for tracking wealth and expenses. Built with React, T
 
 - **Wealth Watch**: Track net worth across multiple asset classes (mutual funds, stocks, real estate, etc.)
 - **Expense Tracker**: Monitor spending with categories and budgets
+  - Category-colored transactions (colored borders + badges)
+  - Advanced filters: categories, payment methods, tags, amount ranges, payment specifics
+  - Pagination for large transaction lists
+  - YTD and month-over-month comparisons
 - **Goals**: Set and track financial targets
 - **Multi-person Support**: Track finances for self and spouse with aggregate views
+- **Charts & Visualizations**: Recharts-powered bar and pie charts
+- **Tags System**: Tag expenses for custom categorization
 
 ## Tech Stack
 
