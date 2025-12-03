@@ -168,3 +168,14 @@ export interface ExpenseSummary {
   byCategory: Record<ExpenseCategory, number>;
   transactions: Expense[];
 }
+
+// Filter state for expenses page
+export interface ExpenseFilterState {
+  categories: ExpenseCategory[];
+  paymentMethods: PaymentMethod[];
+  paymentSpecifics: string[];
+  tags: string[]; // tag IDs
+  amountMin?: number;
+  amountMax?: number;
+  reimbursementStatus: ReimbursementStatus[];
+}

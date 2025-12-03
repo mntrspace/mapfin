@@ -42,6 +42,21 @@ export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   other: 'Other',
 };
 
+// Expense category colors for visual distinction
+export const EXPENSE_CATEGORY_COLORS: Record<ExpenseCategory, string> = {
+  food_dining: '#f97316',           // orange
+  groceries: '#22c55e',             // green
+  transport_travel: '#3b82f6',      // blue
+  utilities_rent: '#8b5cf6',        // purple
+  subscriptions: '#ec4899',         // pink
+  fitness_health: '#14b8a6',        // teal
+  family_house_supplies: '#f59e0b', // amber
+  personal: '#6366f1',              // indigo
+  gifts: '#ef4444',                 // red
+  leisure: '#06b6d4',               // cyan
+  other: '#64748b',                 // slate
+};
+
 // Liability category labels
 export const LIABILITY_CATEGORY_LABELS: Record<LiabilityCategory, string> = {
   home_loan: 'Home Loan',

@@ -4,20 +4,28 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 import { useFormatOptions } from '@/contexts/SettingsContext';
-import { EXPENSE_CATEGORY_LABELS, PAYMENT_METHOD_LABELS, CHART_COLORS } from '@/constants';
+import {
+  EXPENSE_CATEGORY_LABELS,
+  EXPENSE_CATEGORY_COLORS,
+  PAYMENT_METHOD_LABELS,
+  CHART_COLORS,
+} from '@/constants';
 import type { TimeRangeValue } from '@/constants';
-import type { ExpenseCategory, PaymentMethod } from '@/types';
+import type { ExpenseCategory, PaymentMethod, ExpenseFilterState } from '@/types';
 import { Search, Loader2, Receipt, Calendar } from 'lucide-react';
 import {
   useExpenses,
   useBudgets,
   useYTDExpenses,
   useLastMonthExpenses,
+  useTags,
 } from '@/hooks/useSheetData';
 import { PersonTabs, type PersonId } from '@/components/shared/PersonTabs';
 import { TimeRangeSelector } from '@/components/shared/TimeRangeSelector';
 import { StatCard } from '@/components/shared/StatCard';
 import { TagBadge } from '@/components/shared/TagBadge';
+import { ExpenseFilters } from '@/components/shared/ExpenseFilters';
+import { Pagination } from '@/components/shared/Pagination';
 import { ChartContainer, TimeSeriesBarChart, AllocationPieChart } from '@/components/charts';
 import {
   aggregateExpensesByPeriod,
@@ -26,14 +34,29 @@ import {
 } from '@/lib/chartUtils';
 import { getTimeRange, getGranularity, isDateInRange } from '@/lib/dateUtils';
 
+// Initial empty filter state
+const initialFilterState: ExpenseFilterState = {
+  categories: [],
+  paymentMethods: [],
+  paymentSpecifics: [],
+  tags: [],
+  amountMin: undefined,
+  amountMax: undefined,
+  reimbursementStatus: [],
+};
+
 export default function Expenses() {
   const formatOptions = useFormatOptions();
   const [personId, setPersonId] = useState<PersonId>(undefined);
   const [timeRange, setTimeRange] = useState<TimeRangeValue>('3M');
   const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<ExpenseFilterState>(initialFilterState);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
 
   const { data: allExpenses, loading: expensesLoading, error: expensesError } = useExpenses();
   const { data: budgets } = useBudgets();
+  const { tags: availableTags } = useTags();
   const ytdData = useYTDExpenses();
   const lastMonthData = useLastMonthExpenses();
 
@@ -41,13 +64,62 @@ export default function Expenses() {
   const timeRangeData = useMemo(() => getTimeRange(timeRange), [timeRange]);
   const granularity = useMemo(() => getGranularity(timeRange), [timeRange]);
 
-  // Filter expenses by person and time range
+  // Get unique payment specifics from all expenses
+  const uniquePaymentSpecifics = useMemo(() => {
+    const specifics = new Set<string>();
+    allExpenses.forEach((e) => {
+      if (e.payment_specifics) {
+        specifics.add(e.payment_specifics);
+      }
+    });
+    return Array.from(specifics).sort();
+  }, [allExpenses]);
+
+  // Apply all filters in order
   const filteredExpenses = useMemo(() => {
     return allExpenses.filter((e) => {
+      // Person filter
       if (personId && e.person_id !== personId) return false;
-      return isDateInRange(e.date, timeRangeData);
+
+      // Time range filter
+      if (!isDateInRange(e.date, timeRangeData)) return false;
+
+      // Category filter
+      if (filters.categories.length > 0 && !filters.categories.includes(e.category as ExpenseCategory)) {
+        return false;
+      }
+
+      // Payment method filter
+      if (filters.paymentMethods.length > 0 && !filters.paymentMethods.includes(e.payment_method as PaymentMethod)) {
+        return false;
+      }
+
+      // Payment specifics filter
+      if (filters.paymentSpecifics.length > 0 && !filters.paymentSpecifics.includes(e.payment_specifics)) {
+        return false;
+      }
+
+      // Tags filter
+      if (filters.tags.length > 0) {
+        const expenseTagIds = e.tags?.map((t) => t.id) || [];
+        if (!filters.tags.some((tagId) => expenseTagIds.includes(tagId))) {
+          return false;
+        }
+      }
+
+      // Amount range filter
+      const amount = Number(e.inr_amount);
+      if (filters.amountMin !== undefined && amount < filters.amountMin) return false;
+      if (filters.amountMax !== undefined && amount > filters.amountMax) return false;
+
+      // Reimbursement status filter
+      if (filters.reimbursementStatus.length > 0 && !filters.reimbursementStatus.includes(e.reimbursement_status)) {
+        return false;
+      }
+
+      return true;
     });
-  }, [allExpenses, personId, timeRangeData]);
+  }, [allExpenses, personId, timeRangeData, filters]);
 
   // Expenses for totals (exclude reimbursed)
   const expensesForTotals = useMemo(() => {
@@ -84,7 +156,9 @@ export default function Expenses() {
     const query = searchQuery.toLowerCase();
     return filteredExpenses.filter((e) =>
       e.description.toLowerCase().includes(query) ||
-      (EXPENSE_CATEGORY_LABELS[e.category as ExpenseCategory] || e.category).toLowerCase().includes(query)
+      (EXPENSE_CATEGORY_LABELS[e.category as ExpenseCategory] || e.category).toLowerCase().includes(query) ||
+      (e.payment_specifics?.toLowerCase().includes(query)) ||
+      (e.tags?.some((t) => t.name.toLowerCase().includes(query)))
     );
   }, [filteredExpenses, searchQuery]);
 
@@ -94,6 +168,29 @@ export default function Expenses() {
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   }, [searchedExpenses]);
+
+  // Pagination
+  const totalPages = Math.ceil(sortedExpenses.length / pageSize);
+  const paginatedExpenses = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedExpenses.slice(start, start + pageSize);
+  }, [sortedExpenses, currentPage, pageSize]);
+
+  // Reset to page 1 when filters change
+  const handleFiltersChange = (newFilters: ExpenseFilterState) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setFilters(initialFilterState);
+    setCurrentPage(1);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1);
+  };
 
   const loading = expensesLoading;
   const error = expensesError;
@@ -118,7 +215,7 @@ export default function Expenses() {
         </p>
       </div>
 
-      {/* Filters */}
+      {/* Person Filter */}
       <div className="flex flex-wrap items-center gap-4">
         <PersonTabs value={personId} onChange={setPersonId} />
       </div>
@@ -219,78 +316,106 @@ export default function Expenses() {
                 placeholder="Search transactions..."
                 className="pl-8 w-full sm:w-[300px]"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Advanced Filters */}
+          <ExpenseFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            paymentSpecifics={uniquePaymentSpecifics}
+            availableTags={availableTags}
+            onClearFilters={handleClearFilters}
+          />
+
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : sortedExpenses.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
-              {searchQuery ? 'No matching transactions found' : 'No transactions in the selected period'}
+              {searchQuery || Object.values(filters).some((v) => Array.isArray(v) ? v.length > 0 : v !== undefined)
+                ? 'No matching transactions found'
+                : 'No transactions in the selected period'}
             </p>
           ) : (
-            <div className="space-y-3">
-              {sortedExpenses.slice(0, 50).map((expense) => (
-                <div
-                  key={expense.id}
-                  className="flex items-center justify-between py-3 border-b last:border-0"
-                >
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium truncate">{expense.description}</p>
-                      {/* Tags will be shown here when implemented */}
-                      {expense.tags && expense.tags.length > 0 && (
-                        <div className="flex gap-1 flex-wrap">
-                          {expense.tags.map((tag) => (
-                            <TagBadge
-                              key={tag.id}
-                              name={tag.name}
-                              color={tag.color}
-                              size="sm"
-                            />
-                          ))}
+            <>
+              <div className="space-y-2">
+                {paginatedExpenses.map((expense) => {
+                  const categoryColor = EXPENSE_CATEGORY_COLORS[expense.category as ExpenseCategory] || '#64748b';
+                  return (
+                    <div
+                      key={expense.id}
+                      className="flex items-center justify-between py-3 px-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                      style={{ borderLeftWidth: '4px', borderLeftColor: categoryColor }}
+                    >
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium truncate">{expense.description}</p>
+                          {expense.tags && expense.tags.length > 0 && (
+                            <div className="flex gap-1 flex-wrap">
+                              {expense.tags.map((tag) => (
+                                <TagBadge
+                                  key={tag.id}
+                                  name={tag.name}
+                                  color={tag.color}
+                                  size="sm"
+                                />
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
+                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground items-center">
+                          <span>{formatDate(expense.date)}</span>
+                          <span>•</span>
+                          <Badge
+                            variant="secondary"
+                            className="text-xs text-white"
+                            style={{ backgroundColor: categoryColor }}
+                          >
+                            {EXPENSE_CATEGORY_LABELS[expense.category as ExpenseCategory] || expense.category}
+                          </Badge>
+                          <span>•</span>
+                          <span>
+                            {PAYMENT_METHOD_LABELS[expense.payment_method as PaymentMethod] || expense.payment_method}
+                            {expense.payment_specifics && ` (${expense.payment_specifics})`}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right ml-4">
+                        <p className="font-medium">
+                          {formatCurrency(Number(expense.inr_amount), formatOptions)}
+                        </p>
+                        {expense.reimbursement_status !== 'none' && (
+                          <Badge
+                            variant={expense.reimbursement_status === 'reimbursed' ? 'default' : 'outline'}
+                            className="text-xs"
+                          >
+                            {expense.reimbursement_status}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      <span>{formatDate(expense.date)}</span>
-                      <span>•</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {EXPENSE_CATEGORY_LABELS[expense.category as ExpenseCategory] || expense.category}
-                      </Badge>
-                      <span>•</span>
-                      <span>
-                        {PAYMENT_METHOD_LABELS[expense.payment_method as PaymentMethod] || expense.payment_method}
-                        {expense.payment_specifics && ` (${expense.payment_specifics})`}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right ml-4">
-                    <p className="font-medium">
-                      {formatCurrency(Number(expense.inr_amount), formatOptions)}
-                    </p>
-                    {expense.reimbursement_status !== 'none' && (
-                      <Badge
-                        variant={expense.reimbursement_status === 'reimbursed' ? 'default' : 'outline'}
-                        className="text-xs"
-                      >
-                        {expense.reimbursement_status}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {sortedExpenses.length > 50 && (
-                <p className="text-center text-sm text-muted-foreground pt-4">
-                  Showing 50 of {sortedExpenses.length} transactions
-                </p>
-              )}
-            </div>
+                  );
+                })}
+              </div>
+
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={sortedExpenses.length}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+                onPageSizeChange={handlePageSizeChange}
+              />
+            </>
           )}
         </CardContent>
       </Card>
