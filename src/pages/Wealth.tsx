@@ -5,12 +5,14 @@ import { formatCurrency } from '@/lib/formatters';
 import { useFormatOptions } from '@/contexts/SettingsContext';
 import {
   ASSET_CATEGORY_LABELS,
+  ASSET_LIQUIDITY,
   LIABILITY_CATEGORY_LABELS,
   CHART_COLORS,
 } from '@/constants';
 import type { TimeRangeValue } from '@/constants';
 import type { AssetCategory, LiabilityCategory } from '@/types';
-import { Wallet, Landmark, CreditCard, Loader2, BarChart3, Layers } from 'lucide-react';
+import { Wallet, Landmark, CreditCard, Loader2, BarChart3, Layers, Droplets, Lock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useNetWorth, useLiabilities } from '@/hooks/useSheetData';
 import { PersonTabs, type PersonId } from '@/components/shared/PersonTabs';
 import { TimeRangeSelector } from '@/components/shared/TimeRangeSelector';
@@ -51,7 +53,7 @@ export default function Wealth() {
   const granularity = useMemo(() => getGranularity(timeRange), [timeRange]);
 
   // Calculate totals from latest entries
-  const { totalAssets, totalLiabilities, netWorth, latestDate, byCategory } = useMemo(() => {
+  const { totalAssets, totalLiabilities, netWorth, latestDate, byCategory, liquidAssets, illiquidAssets } = useMemo(() => {
     if (filteredEntries.length === 0) {
       return {
         totalAssets: 0,
@@ -59,6 +61,8 @@ export default function Wealth() {
         netWorth: 0,
         latestDate: '',
         byCategory: {} as Record<string, number>,
+        liquidAssets: 0,
+        illiquidAssets: 0,
       };
     }
 
@@ -71,9 +75,23 @@ export default function Wealth() {
     const totalAssets = latestEntries.reduce((sum, e) => sum + Number(e.amount_inr || 0), 0);
     const totalLiabilities = filteredLiabilities.reduce((sum, l) => sum + Number(l.outstanding || 0), 0);
 
+    // Calculate liquid vs illiquid assets
+    let liquidAssets = 0;
+    let illiquidAssets = 0;
+
     const byCategory = latestEntries.reduce(
       (acc, e) => {
-        acc[e.category] = (acc[e.category] || 0) + Number(e.amount_inr || 0);
+        const amount = Number(e.amount_inr || 0);
+        acc[e.category] = (acc[e.category] || 0) + amount;
+
+        // Classify by liquidity
+        const liquidity = ASSET_LIQUIDITY[e.category as AssetCategory];
+        if (liquidity === 'liquid') {
+          liquidAssets += amount;
+        } else {
+          illiquidAssets += amount;
+        }
+
         return acc;
       },
       {} as Record<string, number>
@@ -85,6 +103,8 @@ export default function Wealth() {
       netWorth: totalAssets - totalLiabilities,
       latestDate,
       byCategory,
+      liquidAssets,
+      illiquidAssets,
     };
   }, [filteredEntries, filteredLiabilities]);
 
@@ -183,6 +203,26 @@ export default function Wealth() {
         />
       </div>
 
+      {/* Liquidity Breakdown */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <StatCard
+          title="Liquid Assets"
+          value={liquidAssets}
+          icon={Droplets}
+          loading={loading}
+          subtitle={totalAssets > 0 ? `${((liquidAssets / totalAssets) * 100).toFixed(0)}% of total assets` : undefined}
+          className="[&_[data-value]]:text-blue-600"
+        />
+        <StatCard
+          title="Illiquid Assets"
+          value={illiquidAssets}
+          icon={Lock}
+          loading={loading}
+          subtitle={totalAssets > 0 ? `${((illiquidAssets / totalAssets) * 100).toFixed(0)}% of total assets` : undefined}
+          className="[&_[data-value]]:text-amber-600"
+        />
+      </div>
+
       {/* Time Range Filter */}
       <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
 
@@ -257,17 +297,32 @@ export default function Wealth() {
               <div className="space-y-3">
                 {Object.entries(byCategory)
                   .sort(([, a], [, b]) => b - a)
-                  .map(([category, value]) => (
-                    <div
-                      key={category}
-                      className="flex justify-between items-center py-2 border-b last:border-0"
-                    >
-                      <span className="text-sm">
-                        {ASSET_CATEGORY_LABELS[category as AssetCategory] || category}
-                      </span>
-                      <span className="font-medium">{formatCurrency(value, formatOptions)}</span>
-                    </div>
-                  ))}
+                  .map(([category, value]) => {
+                    const liquidity = ASSET_LIQUIDITY[category as AssetCategory];
+                    return (
+                      <div
+                        key={category}
+                        className="flex justify-between items-center py-2 border-b last:border-0"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">
+                            {ASSET_CATEGORY_LABELS[category as AssetCategory] || category}
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${
+                              liquidity === 'liquid'
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-amber-500 text-amber-600'
+                            }`}
+                          >
+                            {liquidity === 'liquid' ? 'Liquid' : 'Illiquid'}
+                          </Badge>
+                        </div>
+                        <span className="font-medium">{formatCurrency(value, formatOptions)}</span>
+                      </div>
+                    );
+                  })}
                 <div className="flex justify-between items-center py-2 border-t-2 font-bold">
                   <span>Total Assets</span>
                   <span>{formatCurrency(totalAssets, formatOptions)}</span>

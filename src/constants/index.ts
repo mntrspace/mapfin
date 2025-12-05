@@ -27,6 +27,29 @@ export const ASSET_CATEGORY_LABELS: Record<AssetCategory, string> = {
   debt: 'Debt',
 };
 
+// Asset liquidity classification
+// Liquid: can be converted to cash quickly (days to weeks)
+// Illiquid: locked-in, hard to convert, or takes significant time
+export type AssetLiquidity = 'liquid' | 'illiquid';
+
+export const ASSET_LIQUIDITY: Record<AssetCategory, AssetLiquidity> = {
+  mutual_funds: 'liquid',      // Can redeem in 1-3 days
+  stocks_india: 'liquid',      // Can sell on exchange
+  stocks_other: 'liquid',      // Can sell on exchange
+  liquid_cash: 'liquid',       // Already cash
+  forex: 'liquid',             // Can convert
+  digital_assets: 'liquid',    // Can sell on exchange
+  fixed_deposits: 'liquid',    // Can break (with penalty)
+  gold: 'liquid',              // Can sell or pledge
+  real_estate: 'illiquid',     // Takes months to sell
+  esops_rsus: 'illiquid',      // Vesting periods, lock-in
+  epf: 'illiquid',             // Locked until retirement
+  ppf: 'illiquid',             // 15-year lock-in
+  p2p_lending: 'illiquid',     // Locked in loan terms
+  owed: 'illiquid',            // Depends on when paid back
+  debt: 'illiquid',            // Liability (not really applicable)
+};
+
 // Expense category labels
 export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   food_dining: 'Food & Dining',
