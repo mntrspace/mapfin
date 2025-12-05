@@ -1,7 +1,7 @@
 # MapFin - Implementation Plan v1.0
 
-**Status:** IN PROGRESS - Phase 6 Complete (Expense Filters & Pagination)
-**Last Updated:** December 4, 2025
+**Status:** IN PROGRESS - Phase 6.5 Complete (Home Page Redesign & Financial Health)
+**Last Updated:** December 5, 2025
 
 > **Resume Instructions:** If returning to this project after a break, read this file and CONTEXT.md first. Check the "Current Status" section below to see where implementation left off. Each phase has checkboxes - find the first unchecked item and continue from there.
 
@@ -154,6 +154,25 @@ src/
 - Pagination: Page navigation with ellipsis, page size selector (25/50/100)
 - Category colors: Each category has a distinct color shown as left border and badge
 - Filters: Active filter count badge, clear all button
+
+---
+
+### Phase 6.5: Home Page Redesign & Financial Health
+**Estimated Tasks: 6** - COMPLETED
+
+- [x] 6.5.1 Redesign Home page with "financial health story" approach
+- [x] 6.5.2 Add Net Worth hero card with liquid/illiquid breakdown bar
+- [x] 6.5.3 Add Emergency Runway card (liquid assets ÷ critical monthly budget)
+- [x] 6.5.4 Add budget criticality classification (is_critical field on Budget)
+- [x] 6.5.5 Add Goals card with progress bars and hover-to-reveal amounts
+- [x] 6.5.6 Remove quick action button cards
+
+**Implementation Details:**
+- Asset liquidity: `ASSET_LIQUIDITY` constant maps categories to 'liquid' | 'illiquid'
+- Budget criticality: `EXPENSE_CATEGORY_CRITICAL` with defaults, optional `is_critical` field per budget
+- Emergency Runway: Liquid Assets ÷ Critical Monthly Budget, color-coded (green 12+mo, amber 6-12mo, red <6mo)
+- Critical budgets: groceries, transport/travel, utilities/rent, fitness/health, family/house supplies
+- Non-critical: food/dining, subscriptions, leisure, gifts, personal, other
 
 ---
 

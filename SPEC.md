@@ -1,6 +1,6 @@
 # MapFin - Product Specification v1.0
 
-**Status:** Phase 5 Implemented
+**Status:** Phase 6.5 Implemented
 **Last Updated:** December 2025
 
 ---
@@ -37,9 +37,15 @@ MapFin is a personal finance dashboard for tracking wealth and expenses. It prov
 - **Add Expense**: Button always visible (top-right)
 
 ### Pages
-1. **Home** - Summary dashboard with key metrics from all sections
-2. **Wealth Watch** - Full net worth breakdown
-3. **Expenses** - Spending tracker with budgets
+1. **Home** - Financial health dashboard with:
+   - Net Worth hero card (big number + liquid/illiquid breakdown bar)
+   - Liquid Assets card with percentage
+   - Emergency Runway card (months of critical expenses covered)
+   - Last Month Expenses with MoM comparison
+   - YTD Expenses with YoY comparison
+   - Goals card (list view, progress bars, hover for amounts)
+2. **Wealth Watch** - Full net worth breakdown with liquidity classification
+3. **Expenses** - Spending tracker with filters and pagination
 4. **Goals** - Financial goals and progress
 
 ---
