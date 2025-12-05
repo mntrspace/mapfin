@@ -50,6 +50,22 @@ export const ASSET_LIQUIDITY: Record<AssetCategory, AssetLiquidity> = {
   debt: 'illiquid',            // Liability (not really applicable)
 };
 
+// Default critical status for expense categories (for emergency runway calculation)
+// Critical = essential expenses that must be paid even during financial hardship
+export const EXPENSE_CATEGORY_CRITICAL: Record<ExpenseCategory, boolean> = {
+  food_dining: false,           // Discretionary - can cut back
+  groceries: true,              // Essential - need to eat
+  transport_travel: true,       // Essential - need to commute
+  utilities_rent: true,         // Essential - keep a roof
+  subscriptions: false,         // Discretionary - can cancel
+  fitness_health: true,         // Essential - health is priority
+  family_house_supplies: true,  // Essential - household necessities
+  personal: false,              // Discretionary - can defer
+  gifts: false,                 // Discretionary - can skip
+  leisure: false,               // Discretionary - entertainment
+  other: false,                 // Default to non-critical
+};
+
 // Expense category labels
 export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   food_dining: 'Food & Dining',

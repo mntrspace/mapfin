@@ -127,6 +127,7 @@ export interface Budget {
   id: string;
   category: ExpenseCategory;
   monthly_limit: number;
+  is_critical?: boolean; // Whether this is an essential expense for emergency runway calculation
 }
 
 // Goal Types

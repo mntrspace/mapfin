@@ -3,7 +3,7 @@
 **Project Name:** MapFin (Map + Finance = Mapping your finances)
 **Location:** `/Users/mntr-space/Documents/Projects/CtrlFin/MapFin`
 **Last Updated:** December 2025
-**Implementation Status:** Phase 6 Complete - Expense Filters & Pagination
+**Implementation Status:** Phase 6.5 Complete - Home Page Redesign & Financial Health
 
 ---
 
@@ -304,6 +304,30 @@ These are reference files. The app will use a new Google Sheet with the defined 
   - `src/components/shared/Pagination.tsx`
 - **Type additions**:
   - ExpenseFilterState interface
+
+### Phase 6.5 Complete (Home Page Redesign & Financial Health)
+- **Home page redesign** with "financial health story" approach:
+  - Net Worth hero card (large format) with liquid/illiquid breakdown bar
+  - Liquid Assets card with percentage of total
+  - Emergency Runway card (months of critical expenses covered)
+  - Last Month Expenses with MoM comparison
+  - YTD Expenses with YoY comparison
+  - Goals card with progress bars and hover-to-reveal amounts
+- **Asset liquidity classification**:
+  - `ASSET_LIQUIDITY` constant mapping categories to 'liquid' | 'illiquid'
+  - Liquid: mutual funds, stocks, cash, forex, digital assets, FDs, gold
+  - Illiquid: real estate, ESOPs/RSUs, EPF, PPF, P2P lending, owed
+- **Budget criticality classification**:
+  - `EXPENSE_CATEGORY_CRITICAL` constant with default critical status
+  - `is_critical` field added to Budget type
+  - Critical: groceries, transport/travel, utilities/rent, fitness/health, family/house supplies
+  - Non-critical: food/dining, subscriptions, leisure, gifts, personal, other
+- **Emergency Runway calculation**:
+  - Formula: Liquid Assets ÷ Critical Monthly Budget
+  - Color-coded: green (12+ mo), amber (6-12 mo), red (<6 mo)
+- **Removed**: Quick action button cards from Home page
+- **New components**:
+  - Progress component from shadcn/ui
 
 ### Next: Phase 7 (Goals Dashboard)
 - Goal cards with progress bars
