@@ -13,16 +13,16 @@ export function Layout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar - Desktop only */}
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Sidebar - Desktop only (fixed, doesn't scroll) */}
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Header onAddExpense={handleAddExpense} />
 
-        {/* Page Content */}
-        <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
+        {/* Page Content (scrollable) */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
           <Outlet />
         </main>
       </div>

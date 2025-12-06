@@ -45,7 +45,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col border-r bg-background transition-all duration-200',
+        'hidden md:flex flex-col h-full border-r bg-background transition-all duration-200',
         showExpanded ? 'w-64' : 'w-16'
       )}
       onMouseEnter={() => isCollapsed && setIsHovered(true)}
