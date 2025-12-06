@@ -8,12 +8,14 @@ export interface Settings {
   numberFormat: NumberFormat;
   exchangeRate: number;
   lastExchangeUpdate: string;
+  showExactAmounts: boolean;
 }
 
 interface SettingsContextType {
   settings: Settings;
   updateCurrency: (currency: Currency) => void;
   updateNumberFormat: (format: NumberFormat) => void;
+  updateShowExactAmounts: (show: boolean) => void;
   refreshExchangeRate: () => Promise<void>;
 }
 
@@ -26,6 +28,7 @@ const defaultSettings: Settings = {
   numberFormat: 'indian',
   exchangeRate: 83.5,
   lastExchangeUpdate: new Date().toISOString(),
+  showExactAmounts: false,
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -125,6 +128,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const updateShowExactAmounts = (showExactAmounts: boolean) => {
+    setSettings((prev) => {
+      const newSettings = { ...prev, showExactAmounts };
+      saveSettings(newSettings);
+      return newSettings;
+    });
+  };
+
   const refreshExchangeRate = async () => {
     const rate = await fetchExchangeRate();
     const timestamp = new Date().toISOString();
@@ -163,7 +174,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   return (
     <SettingsContext.Provider
-      value={{ settings, updateCurrency, updateNumberFormat, refreshExchangeRate }}
+      value={{ settings, updateCurrency, updateNumberFormat, updateShowExactAmounts, refreshExchangeRate }}
     >
       {children}
     </SettingsContext.Provider>
@@ -185,6 +196,7 @@ export interface FormatOptions {
   currency: Currency;
   numberFormat: NumberFormat;
   exchangeRate: number;
+  showExact?: boolean;
 }
 
 /**
@@ -197,5 +209,6 @@ export function useFormatOptions(): FormatOptions {
     currency: settings.currency,
     numberFormat: settings.numberFormat,
     exchangeRate: settings.exchangeRate,
+    showExact: settings.showExactAmounts,
   };
 }

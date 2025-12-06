@@ -240,7 +240,7 @@ export default function Home() {
                       Illiquid: {formatCurrency(illiquidAssets, formatOptions)} ({(100 - liquidPercent).toFixed(0)}%)
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-amber-200 overflow-hidden">
+                  <div className="h-2 w-full rounded-full bg-amber-500 overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-l-full transition-all"
                       style={{ width: `${liquidPercent}%` }}
@@ -304,7 +304,7 @@ export default function Home() {
       {/* Row 3: Expenses */}
       <div className="grid gap-4 md:grid-cols-2">
         <StatCard
-          title={lastMonth.displayMonth || 'Last Month'}
+          title={`Expenses: ${lastMonth.displayMonth || 'Last Month'}`}
           value={lastMonth.total}
           changePercent={lastMonth.changePercent}
           changeLabel="vs prev month"
@@ -313,7 +313,7 @@ export default function Home() {
         />
 
         <StatCard
-          title={`YTD ${new Date().getFullYear()}`}
+          title={`Expenses YTD ${new Date().getFullYear()}`}
           value={ytd.total}
           changePercent={ytd.changePercent}
           changeLabel="vs last year"

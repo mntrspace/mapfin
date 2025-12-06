@@ -6,6 +6,7 @@ export interface FormatOptions {
   numberFormat?: NumberFormat;
   exchangeRate?: number;
   decimals?: number;
+  showExact?: boolean;
 }
 
 /**
@@ -21,6 +22,7 @@ export function formatCurrency(
     numberFormat = 'western',
     exchangeRate = 83.5,
     decimals = 1,
+    showExact = false,
   } = options;
 
   // Convert amount if displaying in USD
@@ -28,6 +30,12 @@ export function formatCurrency(
   const absAmount = Math.abs(displayAmount);
   const sign = displayAmount < 0 ? '-' : '';
   const symbol = currency === 'INR' ? '₹' : '$';
+
+  // If showExact is true, return full formatted number without abbreviation
+  if (showExact) {
+    const locale = currency === 'INR' ? 'en-IN' : 'en-US';
+    return `${sign}${symbol}${new Intl.NumberFormat(locale).format(Math.round(absAmount))}`;
+  }
 
   // USD always uses western format
   const useIndianFormat = currency === 'INR' && numberFormat === 'indian';

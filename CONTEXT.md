@@ -3,7 +3,7 @@
 **Project Name:** MapFin (Map + Finance = Mapping your finances)
 **Location:** `/Users/mntr-space/Documents/Projects/CtrlFin/MapFin`
 **Last Updated:** December 2025
-**Implementation Status:** Phase 6.5 Complete - Home Page Redesign & Financial Health
+**Implementation Status:** Phase 6.6 Complete - UI Polish & Enhancements
 
 ---
 
@@ -328,6 +328,30 @@ These are reference files. The app will use a new Google Sheet with the defined 
 - **Removed**: Quick action button cards from Home page
 - **New components**:
   - Progress component from shadcn/ui
+
+### Phase 6.6 Complete (UI Polish & Enhancements)
+- **Illiquid color consistency**:
+  - Fixed amber bar color from `bg-amber-200` to `bg-amber-500`
+  - Consistent amber theme for illiquid assets (text and bar)
+- **Expense card clarity**:
+  - Updated card titles to include "Expenses:" prefix
+  - e.g., "Expenses: November 2025" and "Expenses YTD 2025"
+- **Exact amount toggle**:
+  - `showExactAmounts` setting in SettingsContext
+  - Toggle button in sidebar (above Settings link)
+  - Shows full numbers (₹88,20,369) vs compact (₹88.2L)
+  - Icon: Hash (#) for exact mode, Sigma (Σ) for compact mode
+- **Collapsible sidebar**:
+  - Desktop sidebar can be collapsed to icon-only (w-16)
+  - Hover-to-expand when collapsed
+  - Toggle button in logo area (ChevronLeft/ChevronRight)
+  - State persisted in localStorage
+  - Smooth 200ms width transition
+- **Updated files**:
+  - `src/pages/Home.tsx` - color fix, title updates
+  - `src/contexts/SettingsContext.tsx` - showExactAmounts setting
+  - `src/lib/formatters.ts` - showExact option in formatCurrency
+  - `src/components/layout/Sidebar.tsx` - toggle + collapsible
 
 ### Next: Phase 7 (Goals Dashboard)
 - Goal cards with progress bars
