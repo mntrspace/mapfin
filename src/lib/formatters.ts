@@ -32,8 +32,9 @@ export function formatCurrency(
   const symbol = currency === 'INR' ? '₹' : '$';
 
   // If showExact is true, return full formatted number without abbreviation
+  // Use numberFormat to determine comma style (Indian: 10,00,000 vs Western: 1,000,000)
   if (showExact) {
-    const locale = currency === 'INR' ? 'en-IN' : 'en-US';
+    const locale = numberFormat === 'indian' ? 'en-IN' : 'en-US';
     return `${sign}${symbol}${new Intl.NumberFormat(locale).format(Math.round(absAmount))}`;
   }
 

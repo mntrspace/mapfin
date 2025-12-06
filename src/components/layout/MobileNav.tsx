@@ -1,12 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/constants';
-import { LayoutDashboard, Wallet, Receipt, Target, Settings } from 'lucide-react';
+import { LayoutDashboard, Wallet, CreditCard, Target, Settings } from 'lucide-react';
 
 const iconMap = {
   LayoutDashboard,
   Wallet,
-  Receipt,
+  CreditCard,
   Target,
 };
 

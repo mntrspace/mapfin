@@ -9,7 +9,6 @@ import {
   Target,
   Calendar,
   Loader2,
-  Droplets,
   Shield,
   ChevronRight,
 } from 'lucide-react';
@@ -253,22 +252,8 @@ export default function Home() {
         </CardContent>
       </Card>
 
-      {/* Row 2: Liquid Assets + Emergency Runway */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <StatCard
-          title="Liquid Assets"
-          value={liquidAssets}
-          icon={Droplets}
-          loading={loading}
-          subtitle={
-            totalAssets > 0
-              ? `${liquidPercent.toFixed(0)}% of total assets`
-              : undefined
-          }
-          className="[&_[data-value]]:text-blue-600"
-        />
-
-        <Card>
+      {/* Row 2: Emergency Runway */}
+      <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Emergency Runway</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
@@ -299,7 +284,6 @@ export default function Home() {
             )}
           </CardContent>
         </Card>
-      </div>
 
       {/* Row 3: Expenses */}
       <div className="grid gap-4 md:grid-cols-2">
@@ -348,32 +332,30 @@ export default function Home() {
               {processedGoals.slice(0, 4).map((goal) => (
                 <div key={goal.id} className="group">
                   <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <Target className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium text-sm">{goal.name}</span>
-                      <span className="text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <span className="font-medium text-sm truncate">{goal.name}</span>
+                      <span className="text-xs text-muted-foreground flex-shrink-0">
                         {GOAL_TYPE_LABELS[goal.type]}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          'text-sm font-medium',
-                          goal.progress >= 100 ? 'text-green-600' : ''
-                        )}
-                      >
-                        {goal.progress.toFixed(0)}%
-                      </span>
-                      {/* Hover to reveal amounts */}
-                      <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                        {formatCurrency(goal.current, formatOptions)} / {formatCurrency(goal.target, formatOptions)}
-                      </span>
-                    </div>
+                    <span
+                      className={cn(
+                        'text-sm font-medium tabular-nums text-right w-12 flex-shrink-0',
+                        goal.progress >= 100 ? 'text-green-600' : ''
+                      )}
+                    >
+                      {goal.progress.toFixed(0)}%
+                    </span>
                   </div>
                   <Progress
                     value={Math.min(goal.progress, 100)}
                     className="h-2"
                   />
+                  {/* Hover to reveal amounts */}
+                  <div className="text-xs text-muted-foreground mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-right">
+                    {formatCurrency(goal.current, formatOptions)} / {formatCurrency(goal.target, formatOptions)}
+                  </div>
                 </div>
               ))}
               {processedGoals.length > 4 && (

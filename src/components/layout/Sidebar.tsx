@@ -6,7 +6,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import {
   LayoutDashboard,
   Wallet,
-  Receipt,
+  CreditCard,
   Target,
   Settings,
   Hash,
@@ -18,7 +18,7 @@ import {
 const iconMap = {
   LayoutDashboard,
   Wallet,
-  Receipt,
+  CreditCard,
   Target,
 };
 

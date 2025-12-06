@@ -167,7 +167,7 @@ export type PersonFilter = (typeof PERSON_FILTERS)[number]['value'];
 export const NAV_ITEMS = [
   { path: '/', label: 'Home', icon: 'LayoutDashboard' },
   { path: '/wealth', label: 'Wealth', icon: 'Wallet' },
-  { path: '/expenses', label: 'Expenses', icon: 'Receipt' },
+  { path: '/expenses', label: 'Expenses', icon: 'CreditCard' },
   { path: '/goals', label: 'Goals', icon: 'Target' },
 ] as const;
 
