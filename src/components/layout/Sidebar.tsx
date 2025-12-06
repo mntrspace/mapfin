@@ -3,14 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/constants';
 import { useSettings } from '@/contexts/SettingsContext';
+import { Switch } from '@/components/ui/switch';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
   LayoutDashboard,
   Wallet,
   CreditCard,
   Target,
   Settings,
-  Hash,
-  Sigma,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -104,24 +109,45 @@ export function Sidebar() {
 
       {/* Exact Amount Toggle */}
       <div className={cn('p-2 border-t', !showExpanded && 'flex justify-center')}>
-        <button
-          onClick={() => updateShowExactAmounts(!settings.showExactAmounts)}
-          className={cn(
-            'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full',
-            'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-            !showExpanded && 'justify-center w-auto'
-          )}
-          title={settings.showExactAmounts ? 'Show compact amounts' : 'Show exact amounts'}
-        >
-          {settings.showExactAmounts ? (
-            <Hash className="h-5 w-5 flex-shrink-0" />
-          ) : (
-            <Sigma className="h-5 w-5 flex-shrink-0" />
-          )}
-          {showExpanded && (
-            <span>{settings.showExactAmounts ? 'Exact' : 'Compact'}</span>
-          )}
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm',
+                  showExpanded ? 'justify-between w-full' : 'justify-center'
+                )}
+              >
+                {showExpanded && (
+                  <span className={cn(
+                    'text-xs font-medium transition-colors',
+                    !settings.showExactAmounts ? 'text-foreground' : 'text-muted-foreground'
+                  )}>
+                    Compact
+                  </span>
+                )}
+                <Switch
+                  checked={settings.showExactAmounts}
+                  onCheckedChange={updateShowExactAmounts}
+                />
+                {showExpanded && (
+                  <span className={cn(
+                    'text-xs font-medium transition-colors',
+                    settings.showExactAmounts ? 'text-foreground' : 'text-muted-foreground'
+                  )}>
+                    Exact
+                  </span>
+                )}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="max-w-[200px]">
+              <p className="text-xs">
+                <strong>Compact:</strong> 1.2L, 50K<br />
+                <strong>Exact:</strong> 1,20,000
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Settings Link */}
