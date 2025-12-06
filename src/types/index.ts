@@ -92,14 +92,18 @@ export interface Tag {
   color: string; // Hex color like "#3b82f6"
 }
 
+// Expense Currency
+export type ExpenseCurrency = 'INR' | 'USD' | 'AED' | 'EUR' | 'GBP';
+
 // Expense
 export interface Expense {
   id: string;
   date: string;
   description: string;
   category: ExpenseCategory;
-  currency_amount: number | string; // Can be "$50" or 50
-  inr_amount: number;
+  currency: ExpenseCurrency; // Original currency (INR, USD, AED, etc.)
+  currency_amount: number | string; // Amount in original currency
+  inr_amount: number; // Converted INR amount
   payment_method: PaymentMethod;
   payment_specifics: string;
   transaction_details?: string; // Google Drive link, etc.

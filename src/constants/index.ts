@@ -1,6 +1,7 @@
 import type {
   AssetCategory,
   ExpenseCategory,
+  ExpenseCurrency,
   LiabilityCategory,
   PaymentMethod,
   ReimbursementStatus,
@@ -120,6 +121,15 @@ export const REIMBURSEMENT_STATUS_LABELS: Record<ReimbursementStatus, string> = 
   none: 'None',
   pending: 'Pending',
   reimbursed: 'Reimbursed',
+};
+
+// Expense Currency Labels
+export const EXPENSE_CURRENCY_LABELS: Record<ExpenseCurrency, string> = {
+  INR: '₹ INR',
+  USD: '$ USD',
+  AED: 'د.إ AED',
+  EUR: '€ EUR',
+  GBP: '£ GBP',
 };
 
 // Income source labels
